@@ -43,41 +43,5 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCwwlBaAPw8AqcWrtVisWPydU4dIPT542o',
-    appId: '1:533197642878:web:07643300bbe97b12c54c2f',
-    messagingSenderId: '533197642878',
-    projectId: 'flutter-scrumboard',
-    authDomain: 'flutter-scrumboard.firebaseapp.com',
-    storageBucket: 'flutter-scrumboard.appspot.com',
-    measurementId: 'G-G0H3D1TRSK',
-  );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCwB1nFQJAUctCgqaBVpoX7CThoJayKZ_I',
-    appId: '1:533197642878:android:19d2b951278ba94cc54c2f',
-    messagingSenderId: '533197642878',
-    projectId: 'flutter-scrumboard',
-    storageBucket: 'flutter-scrumboard.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDZiH0QvvgoNkBoTk4Cbf0_U1qAMN4g9LA',
-    appId: '1:533197642878:ios:2ff0b5de4d894c1dc54c2f',
-    messagingSenderId: '533197642878',
-    projectId: 'flutter-scrumboard',
-    storageBucket: 'flutter-scrumboard.appspot.com',
-    iosClientId: '533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com',
-    iosBundleId: 'com.example.flutterScrumboard',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDZiH0QvvgoNkBoTk4Cbf0_U1qAMN4g9LA',
-    appId: '1:533197642878:ios:2ff0b5de4d894c1dc54c2f',
-    messagingSenderId: '533197642878',
-    projectId: 'flutter-scrumboard',
-    storageBucket: 'flutter-scrumboard.appspot.com',
-    iosClientId: '533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com',
-    iosBundleId: 'com.example.flutterScrumboard',
-  );
+  //CONST
 }
