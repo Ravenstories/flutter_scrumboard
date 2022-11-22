@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "533197642878",
+    "project_id": "flutter-scrumboard",
+    "storage_bucket": "flutter-scrumboard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:533197642878:android:19d2b951278ba94cc54c2f",
+        "android_client_info": {
+          "package_name": "com.example.flutter_scrumboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "533197642878-aldjf7soffqcql67jk6ra3slf8eah97k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwB1nFQJAUctCgqaBVpoX7CThoJayKZ_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "533197642878-aldjf7soffqcql67jk6ra3slf8eah97k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
