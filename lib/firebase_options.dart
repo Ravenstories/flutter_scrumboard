@@ -50,6 +50,7 @@ class DefaultFirebaseOptions {
     projectId: 'flutter-scrumboard',
     authDomain: 'flutter-scrumboard.firebaseapp.com',
     storageBucket: 'flutter-scrumboard.appspot.com',
+    measurementId: 'G-G0H3D1TRSK',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -66,7 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '533197642878',
     projectId: 'flutter-scrumboard',
     storageBucket: 'flutter-scrumboard.appspot.com',
-    iosClientId: '533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com',
+    iosClientId:
+        '533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterScrumboard',
   );
 
@@ -76,7 +78,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '533197642878',
     projectId: 'flutter-scrumboard',
     storageBucket: 'flutter-scrumboard.appspot.com',
-    iosClientId: '533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com',
+    iosClientId:
+        '533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterScrumboard',
   );
 }
