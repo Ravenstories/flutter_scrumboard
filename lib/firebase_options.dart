@@ -50,7 +50,6 @@ class DefaultFirebaseOptions {
     projectId: 'flutter-scrumboard',
     authDomain: 'flutter-scrumboard.firebaseapp.com',
     storageBucket: 'flutter-scrumboard.appspot.com',
-    measurementId: 'G-G0H3D1TRSK',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

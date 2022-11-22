@@ -29,6 +29,13 @@
             {
               "client_id": "533197642878-aldjf7soffqcql67jk6ra3slf8eah97k.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "533197642878-fpntr27vt3s8p00pn8q2ajemqs0f399s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterScrumboard"
+              }
             }
           ]
         }
