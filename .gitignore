@@ -8,8 +8,7 @@
 .buildlog/
 .history
 .svn/
-migrate_working_dir/
-lib\firebase_options.dart
+lib\shared\firebase_options.dart
 
 # IntelliJ related
 *.iml
