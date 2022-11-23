@@ -1,6 +1,6 @@
 class BoardListObject {
   late String title;
-  late List<BoardItemObject> items;
+  late List<BoardItemObject> items = [];
 
   BoardListObject({required this.title, required this.items});
 }
@@ -9,15 +9,25 @@ class BoardListObject {
 class BoardItemObject {
   String id;
   String title;
-  String to;
-  String from;
+  String assignedTo;
+  String assignedBy;
   String description;
 
   BoardItemObject({
     this.id = "",
     this.title = "",
-    this.to = "",
-    this.from = "",
+    this.assignedTo = "",
+    this.assignedBy = "",
     this.description = "",
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'assignedTo': assignedTo,
+      'assignedBy': assignedBy,
+      'description': description,
+    };
+  }
 }

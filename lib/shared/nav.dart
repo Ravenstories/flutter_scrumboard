@@ -1,6 +1,5 @@
-import '../Models/boardModel.dart';
 import '../Pages/boardPage.dart';
-import '../Pages/userPage.dart';
+import '../pages/userPage.dart';
 import 'shared.dart';
 import '../main.dart';
 
@@ -37,7 +36,7 @@ Widget buildHeader(BuildContext context) => Container(
                     'https://avatars.githubusercontent.com/u/16825387?s=460&u=3b4b3b4b3b4b3b4b3b4b3b4b3b4b3b4b3b4b3b4b&v=4'),
                 radius: 32,
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +80,7 @@ Widget buildMenuItem(BuildContext context) => Container(
           leading: const Icon(Icons.grid_on_outlined),
           title: const Text('Board'),
           onTap: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => BoardPage())),
+              .push(MaterialPageRoute(builder: (context) => const BoardPage())),
         ),
         const Divider(
           color: Colors.black54,

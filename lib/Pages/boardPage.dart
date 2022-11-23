@@ -1,13 +1,28 @@
+import 'dart:js';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_scrumboard/models/boardModel.dart';
 import 'package:boardview/board_item.dart';
 import 'package:boardview/board_list.dart';
 import 'package:boardview/boardview.dart';
 import 'package:boardview/boardview_controller.dart';
-import 'package:flutter_scrumboard/Models/boardModel.dart';
+import 'package:flutter/material.dart';
 
+import '../main.dart';
 import '../shared/shared.dart';
 
-class BoardPage extends StatelessWidget {
-  BoardPage({super.key});
+class BoardPage extends StatefulWidget {
+  const BoardPage({super.key});
+
+  @override
+  State<BoardPage> createState() => BoardPageView();
+}
+
+class BoardPageView extends State<BoardPage> {
+  final controllerTitle = TextEditingController();
+  final controllerDescription = TextEditingController();
+  final controllerAssignedTo = TextEditingController();
+  final controllerAssignedBy = TextEditingController();
 
   final List<BoardListObject> _listData = [
     BoardListObject(
@@ -16,74 +31,32 @@ class BoardPage extends StatelessWidget {
         BoardItemObject(
           id: '1',
           title: 'Create a new Flutter project',
-          to: 'To Do',
-          from: 'In Progress',
+          assignedTo: 'To Do',
+          assignedBy: 'In Progress',
           description: 'Create a new Flutter project',
         ),
         BoardItemObject(
           id: '2',
           title: 'Create a new Flutter project',
-          to: 'To Do',
-          from: 'In Progress',
-          description: 'Create a new Flutter project',
-        ),
-        BoardItemObject(
-          id: '3',
-          title: 'Create a new Flutter project',
-          to: 'To Do',
-          from: 'In Progress',
-          description: 'Create a new Flutter project',
-        ),
-        BoardItemObject(
-          id: '4',
-          title: 'Create a new Flutter project',
-          to: 'To Do',
-          from: 'In Progress',
-          description: 'Create a new Flutter project',
-        ),
-        BoardItemObject(
-          id: '5',
-          title: 'Create a new Flutter project',
-          to: 'To Do',
-          from: 'In Progress',
+          assignedTo: 'To Do',
+          assignedBy: 'In Progress',
           description: 'Create a new Flutter project',
         ),
       ],
     ),
     BoardListObject(title: 'In Progress', items: [
       BoardItemObject(
-        id: '6',
-        title: 'Create a new Flutter project',
-        to: 'In Progress',
-        from: 'To Do',
-        description: 'Create a new Flutter project',
-      ),
-      BoardItemObject(
-        id: '7',
-        title: 'Create a new Flutter project',
-        to: 'In Progress',
-        from: 'To Do',
-        description: 'Create a new Flutter project',
-      ),
-      BoardItemObject(
-        id: '8',
-        title: 'Create a new Flutter project',
-        to: 'In Progress',
-        from: 'To Do',
-        description: 'Create a new Flutter project',
-      ),
-      BoardItemObject(
         id: '9',
         title: 'Create a new Flutter project',
-        to: 'In Progress',
-        from: 'To Do',
+        assignedTo: 'In Progress',
+        assignedBy: 'To Do',
         description: 'Create a new Flutter project',
       ),
       BoardItemObject(
         id: '10',
         title: 'Create a new Flutter project',
-        to: 'In Progress',
-        from: 'To Do',
+        assignedBy: 'In Progress',
+        assignedTo: 'To Do',
         description: 'Create a new Flutter project',
       )
     ])
@@ -92,19 +65,32 @@ class BoardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<BoardList> list = [];
+    List<BoardList> list = <BoardList>[];
 
     for (int i = 0; i < _listData.length; i++) {
       list.add(createBoardList(_listData[i]));
     }
 
-    return Padding(
-        padding: const EdgeInsets.all(16),
-        child:
-            BoardView(lists: list, boardViewController: boardViewController));
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("BoardView Example"),
+      ),
+      drawer: const NavigationDrawer(),
+      body: Center(
+        child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: BoardView(
+                lists: list, boardViewController: boardViewController)),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => createItem(context),
+        tooltip: 'Add Item to Board',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
   }
 
-  Widget createBoardList(BoardListObject listObject) {
+  createBoardList(BoardListObject listObject) {
     List<BoardItem> items = [];
 
     for (int i = 0; i < listObject.items.length; i++) {
@@ -112,20 +98,15 @@ class BoardPage extends StatelessWidget {
     }
 
     return BoardList(
-      onStartDragList: (index) {
-        print('onStartDragList: $index');
-      },
-      onTapList: (listIndex) async {
-        print('onTapList: $listIndex');
-      },
+      onStartDragList: (index) {},
+      onTapList: (listIndex) async {},
       onDropList: (oldListIndex, listIndex) {
-        print('onDropList: $oldListIndex, $listIndex');
         var list = _listData[oldListIndex!];
         _listData.removeAt(oldListIndex);
         _listData.insert(listIndex!, list);
       },
       headerBackgroundColor: Colors.transparent,
-      backgroundColor: Color(0xFFE5E5E5),
+      backgroundColor: const Color(0xFFE5E5E5),
       header: <Widget>[
         Expanded(
           child: Container(
@@ -144,7 +125,7 @@ class BoardPage extends StatelessWidget {
     );
   }
 
-  Widget buildBoardItem(BoardItemObject itemObject) {
+  buildBoardItem(BoardItemObject itemObject) {
     return BoardItem(
       onStartDragItem: (listIndex, itemIndex, state) => {},
       onDropItem: (listIndex, itemIndex, oldListIndex, oldItemIndex, state) {
@@ -152,7 +133,7 @@ class BoardPage extends StatelessWidget {
         _listData[oldListIndex].items.removeAt(oldItemIndex);
         _listData[listIndex!].items.insert(itemIndex!, item);
       },
-      onTapItem: (listIndex, itemIndex, state) => {},
+      onTapItem: (listIndex, itemIndex, state) async {},
       item: Container(
         margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
         child: Card(
@@ -182,5 +163,66 @@ class BoardPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  createItem(BuildContext context) => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Create Item'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                  controller: controllerTitle,
+                  decoration: const InputDecoration(
+                    hintText: 'Title',
+                  )),
+              TextField(
+                  controller: controllerAssignedTo,
+                  decoration: const InputDecoration(
+                    hintText: 'Assigned To',
+                  )),
+              TextField(
+                  controller: controllerAssignedBy,
+                  decoration: const InputDecoration(
+                    hintText: 'Assigned By',
+                  )),
+              TextField(
+                  controller: controllerDescription,
+                  decoration: const InputDecoration(
+                    hintText: 'Description',
+                  )),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => submit(context),
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
+      );
+
+  void submit(context) {
+    var item = BoardItemObject(
+      title: controllerTitle.text,
+      assignedTo: controllerAssignedTo.text,
+      assignedBy: controllerAssignedBy.text,
+      description: controllerDescription.text,
+    );
+    submitItemToDatabase(context, item);
+  }
+
+  Future submitItemToDatabase(context, BoardItemObject item) async {
+    final docItem =
+        FirebaseFirestore.instance.collection('BoardItemObject').doc();
+    item.id = docItem.id;
+    final json = item.toJson();
+    await docItem.set(json);
+    Navigator.pop(context);
   }
 }
