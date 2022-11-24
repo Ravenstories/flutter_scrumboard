@@ -1,14 +1,10 @@
-import 'dart:js';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_scrumboard/models/boardModel.dart';
 import 'package:boardview/board_item.dart';
 import 'package:boardview/board_list.dart';
 import 'package:boardview/boardview.dart';
 import 'package:boardview/boardview_controller.dart';
-import 'package:flutter/material.dart';
 
-import '../main.dart';
 import '../shared/shared.dart';
 
 class BoardPage extends StatefulWidget {
@@ -19,82 +15,105 @@ class BoardPage extends StatefulWidget {
 }
 
 class BoardPageView extends State<BoardPage> {
+  Stream<List<BoardListObject>> boardStream() => FirebaseFirestore.instance
+      .collection('BoardListObject')
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => BoardListObject.listFromJson(doc.data()))
+          .toList());
+  Stream<List<BoardListObject>> itemStream() => FirebaseFirestore.instance
+      .collection('BoardItemObject')
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => BoardListObject.listFromJson(doc.data()))
+          .toList());
+
   final controllerTitle = TextEditingController();
   final controllerDescription = TextEditingController();
   final controllerAssignedTo = TextEditingController();
   final controllerAssignedBy = TextEditingController();
 
-  final List<BoardListObject> _listData = [
-    BoardListObject(
-      title: 'To Do',
-      items: [
-        BoardItemObject(
-          id: '1',
-          title: 'Create a new Flutter project',
-          assignedTo: 'To Do',
-          assignedBy: 'In Progress',
-          description: 'Create a new Flutter project',
-        ),
-        BoardItemObject(
-          id: '2',
-          title: 'Create a new Flutter project',
-          assignedTo: 'To Do',
-          assignedBy: 'In Progress',
-          description: 'Create a new Flutter project',
-        ),
-      ],
-    ),
-    BoardListObject(title: 'In Progress', items: [
-      BoardItemObject(
-        id: '9',
-        title: 'Create a new Flutter project',
-        assignedTo: 'In Progress',
-        assignedBy: 'To Do',
-        description: 'Create a new Flutter project',
-      ),
-      BoardItemObject(
-        id: '10',
-        title: 'Create a new Flutter project',
-        assignedBy: 'In Progress',
-        assignedTo: 'To Do',
-        description: 'Create a new Flutter project',
-      )
-    ])
-  ];
   final BoardViewController boardViewController = BoardViewController();
+
+  late List<BoardListObject> _listData;
 
   @override
   Widget build(BuildContext context) {
     List<BoardList> list = <BoardList>[];
 
-    for (int i = 0; i < _listData.length; i++) {
-      list.add(createBoardList(_listData[i]));
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("BoardView Example"),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Center(
-        child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: BoardView(
-                lists: list, boardViewController: boardViewController)),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => createItem(context),
-        tooltip: 'Add Item to Board',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        appBar: AppBar(
+          title: const Text("BoardView Example"),
+        ),
+        drawer: const NavigationDrawer(),
+        body: StreamBuilder<List<BoardListObject>>(
+            stream: boardStream(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                print(snapshot.error);
+                return const Text('Something went wrong');
+              } else if (snapshot.hasData) {
+                _listData = snapshot.data!;
+                return StreamBuilder(
+                    stream: itemStream(),
+                    builder: (context, snapshot2) {
+                      //Create function that combines the two streams
+                      if (snapshot2.hasError) {
+                        print(snapshot2.error);
+                        return const Text('Something went wrong');
+                      } else if (snapshot2.hasData) {
+                        for (int i = 0; i < _listData.length; i++) {
+                          list.add(createBoardList(_listData[i]));
+                        }
+                        return BoardView(
+                            lists: list,
+                            boardViewController: boardViewController);
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    });
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                FloatingActionButton(
+                  heroTag: "btn1",
+                  onPressed: () => createItem(context),
+                  tooltip: 'Add Item to Board',
+                  child: const Icon(Icons.add),
+                ),
+                FloatingActionButton(
+                  heroTag: "btn2",
+                  onPressed: () => createList(context),
+                  tooltip: 'Create new list',
+                  child: const Icon(Icons.list_alt_outlined),
+                ),
+              ],
+            ))
+
+        // This trailing comma makes auto-formatting nicer for build methods.
+        );
   }
 
+/*
+  Widget createBoardList(BoardListObject listObject) => ListTile(
+        title: Text(listObject.title),
+      );
+*/
   createBoardList(BoardListObject listObject) {
-    List<BoardItem> items = [];
+    List<BoardItem>? items = [];
 
-    for (int i = 0; i < listObject.items.length; i++) {
-      items.insert(i, buildBoardItem(listObject.items[i]));
+    if (listObject.items != null) {
+      for (int i = 0; i < listObject.items!.length; i++) {
+        items.add(buildBoardItem(listObject.items![i]));
+      }
     }
 
     return BoardList(
@@ -129,9 +148,9 @@ class BoardPageView extends State<BoardPage> {
     return BoardItem(
       onStartDragItem: (listIndex, itemIndex, state) => {},
       onDropItem: (listIndex, itemIndex, oldListIndex, oldItemIndex, state) {
-        var item = _listData[oldListIndex!].items[oldItemIndex!];
-        _listData[oldListIndex].items.removeAt(oldItemIndex);
-        _listData[listIndex!].items.insert(itemIndex!, item);
+        var item = _listData[oldListIndex!].items?[oldItemIndex!];
+        _listData[oldListIndex].items?.removeAt(oldItemIndex!);
+        _listData[listIndex!].items?.insert(itemIndex!, item!);
       },
       onTapItem: (listIndex, itemIndex, state) async {},
       item: Container(
@@ -221,7 +240,48 @@ class BoardPageView extends State<BoardPage> {
     final docItem =
         FirebaseFirestore.instance.collection('BoardItemObject').doc();
     item.id = docItem.id;
-    final json = item.toJson();
+    final json = item.itemToJson();
+    await docItem.set(json);
+    Navigator.pop(context);
+  }
+
+  createList(BuildContext context) => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Create List'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                  controller: controllerTitle,
+                  decoration: const InputDecoration(
+                    hintText: 'Title',
+                  )),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => submitList(context),
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
+      );
+
+  void submitList(context) {
+    var list = BoardListObject(title: controllerTitle.text, items: []);
+    submitListToDatabase(context, list);
+  }
+
+  Future submitListToDatabase(context, BoardListObject list) async {
+    final docItem =
+        FirebaseFirestore.instance.collection('BoardListObject').doc();
+    list.id = docItem.id;
+    final json = list.listToJson();
     await docItem.set(json);
     Navigator.pop(context);
   }

@@ -1,4 +1,4 @@
-import '../Pages/boardPage.dart';
+import '../pages/boardPage.dart';
 import '../pages/userPage.dart';
 import 'shared.dart';
 import '../main.dart';
