@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_scrumboard/models/boardModel.dart';
 import 'package:boardview/board_item.dart';
@@ -15,27 +17,29 @@ class BoardPage extends StatefulWidget {
 }
 
 class BoardPageView extends State<BoardPage> {
-  Stream<List<BoardListObject>> boardStream() => FirebaseFirestore.instance
+  Stream<List<BoardListObject>> listStream() => FirebaseFirestore.instance
       .collection('BoardListObject')
       .snapshots()
       .map((snapshot) => snapshot.docs
           .map((doc) => BoardListObject.listFromJson(doc.data()))
           .toList());
-  Stream<List<BoardListObject>> itemStream() => FirebaseFirestore.instance
+  Stream<List<BoardItemObject>> itemStream() => FirebaseFirestore.instance
       .collection('BoardItemObject')
       .snapshots()
       .map((snapshot) => snapshot.docs
-          .map((doc) => BoardListObject.listFromJson(doc.data()))
+          .map((doc) => BoardItemObject.itemFromJson(doc.data()))
           .toList());
 
   final controllerTitle = TextEditingController();
   final controllerDescription = TextEditingController();
+  final controllerInBoard = TextEditingController();
   final controllerAssignedTo = TextEditingController();
   final controllerAssignedBy = TextEditingController();
 
   final BoardViewController boardViewController = BoardViewController();
 
   late List<BoardListObject> _listData;
+  late List<BoardItemObject> _itemData;
 
   @override
   Widget build(BuildContext context) {
@@ -47,21 +51,24 @@ class BoardPageView extends State<BoardPage> {
         ),
         drawer: const NavigationDrawer(),
         body: StreamBuilder<List<BoardListObject>>(
-            stream: boardStream(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                print(snapshot.error);
-                return const Text('Something went wrong');
-              } else if (snapshot.hasData) {
-                _listData = snapshot.data!;
-                return StreamBuilder(
+            stream: listStream(),
+            builder: (context, listSnapshot) {
+              if (listSnapshot.hasError) {
+                print(listSnapshot.error);
+                return const Text(
+                    'Something went wrong with getting the lists');
+              } else if (listSnapshot.hasData) {
+                _listData = listSnapshot.data!;
+                return StreamBuilder<List<BoardItemObject>>(
                     stream: itemStream(),
-                    builder: (context, snapshot2) {
-                      //Create function that combines the two streams
-                      if (snapshot2.hasError) {
-                        print(snapshot2.error);
-                        return const Text('Something went wrong');
-                      } else if (snapshot2.hasData) {
+                    builder: (context, itemSnapshot) {
+                      if (itemSnapshot.hasError) {
+                        print(itemSnapshot.error);
+                        return const Text(
+                            'Something went wrong with getting the items');
+                      } else if (itemSnapshot.hasData) {
+                        _itemData = itemSnapshot.data!;
+                        combineStreams();
                         for (int i = 0; i < _listData.length; i++) {
                           list.add(createBoardList(_listData[i]));
                         }
@@ -85,28 +92,35 @@ class BoardPageView extends State<BoardPage> {
               children: <Widget>[
                 FloatingActionButton(
                   heroTag: "btn1",
-                  onPressed: () => createItem(context),
+                  onPressed: () => createNewItem(context),
                   tooltip: 'Add Item to Board',
                   child: const Icon(Icons.add),
                 ),
                 FloatingActionButton(
                   heroTag: "btn2",
-                  onPressed: () => createList(context),
+                  onPressed: () => createNewList(context),
                   tooltip: 'Create new list',
                   child: const Icon(Icons.list_alt_outlined),
                 ),
               ],
-            ))
-
-        // This trailing comma makes auto-formatting nicer for build methods.
-        );
+            )));
   }
 
-/*
-  Widget createBoardList(BoardListObject listObject) => ListTile(
-        title: Text(listObject.title),
-      );
-*/
+  combineStreams() {
+    //combine _listData and _itemData
+    _listData.forEach((listElement) {
+      listElement.items = [];
+      //add item to list
+      print(listElement.title);
+      _itemData.forEach((itemElement) {
+        if (listElement.title == itemElement.inBoard) {
+          print(itemElement.title);
+          listElement.items?.add(itemElement);
+        }
+      });
+    });
+  }
+
   createBoardList(BoardListObject listObject) {
     List<BoardItem>? items = [];
 
@@ -171,7 +185,7 @@ class BoardPageView extends State<BoardPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  itemObject.description,
+                  itemObject.description ?? '',
                   style: const TextStyle(
                     fontSize: 14,
                   ),
@@ -184,7 +198,7 @@ class BoardPageView extends State<BoardPage> {
     );
   }
 
-  createItem(BuildContext context) => showDialog(
+  createNewItem(BuildContext context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Create Item'),
@@ -229,6 +243,7 @@ class BoardPageView extends State<BoardPage> {
   void submit(context) {
     var item = BoardItemObject(
       title: controllerTitle.text,
+      inBoard: 'To-Do',
       assignedTo: controllerAssignedTo.text,
       assignedBy: controllerAssignedBy.text,
       description: controllerDescription.text,
@@ -245,7 +260,7 @@ class BoardPageView extends State<BoardPage> {
     Navigator.pop(context);
   }
 
-  createList(BuildContext context) => showDialog(
+  createNewList(BuildContext context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Create List'),

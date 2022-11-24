@@ -22,12 +22,12 @@ class BoardListObject {
 
 // Create boardItemObject
 class BoardItemObject {
-  String id;
-  String inBoard;
+  String? id;
+  String? inBoard;
   String title;
-  String assignedTo;
-  String assignedBy;
-  String description;
+  String? assignedTo;
+  String? assignedBy;
+  String? description;
 
   BoardItemObject({
     this.id = "",
@@ -49,7 +49,8 @@ class BoardItemObject {
     };
   }
 
-  BoardItemObject itemFromJson(Map<String, dynamic> json) => BoardItemObject(
+  static BoardItemObject itemFromJson(Map<String, dynamic> json) =>
+      BoardItemObject(
         id: json['id'],
         title: json['title'],
         inBoard: json['inBoard'],
