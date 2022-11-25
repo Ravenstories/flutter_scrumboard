@@ -59,6 +59,8 @@ class BoardPageView extends State<BoardPage> {
                     'Something went wrong with getting the lists');
               } else if (listSnapshot.hasData) {
                 _listData = listSnapshot.data!;
+                _listData
+                    .sort((a, b) => a.indexNumber.compareTo(b.indexNumber));
                 return StreamBuilder<List<BoardItemObject>>(
                     stream: itemStream(),
                     builder: (context, itemSnapshot) {
@@ -69,6 +71,7 @@ class BoardPageView extends State<BoardPage> {
                       } else if (itemSnapshot.hasData) {
                         _itemData = itemSnapshot.data!;
                         combineStreams();
+                        list = [];
                         for (int i = 0; i < _listData.length; i++) {
                           list.add(createBoardList(_listData[i]));
                         }
@@ -129,14 +132,20 @@ class BoardPageView extends State<BoardPage> {
         items.add(buildBoardItem(listObject.items![i]));
       }
     }
-
     return BoardList(
       onStartDragList: (index) {},
       onTapList: (listIndex) async {},
       onDropList: (oldListIndex, listIndex) {
-        var list = _listData[oldListIndex!];
-        _listData.removeAt(oldListIndex);
-        _listData.insert(listIndex!, list);
+        final docRefOld = FirebaseFirestore.instance
+            .collection('BoardListObject')
+            .doc(_listData[listIndex!].id);
+
+        final docRef = FirebaseFirestore.instance
+            .collection('BoardListObject')
+            .doc(_listData[oldListIndex!].id);
+
+        docRefOld.update({'indexNumber': oldListIndex});
+        docRef.update({'indexNumber': listIndex});
       },
       headerBackgroundColor: Colors.transparent,
       backgroundColor: const Color(0xFFE5E5E5),
@@ -165,8 +174,39 @@ class BoardPageView extends State<BoardPage> {
         var item = _listData[oldListIndex!].items?[oldItemIndex!];
         _listData[oldListIndex].items?.removeAt(oldItemIndex!);
         _listData[listIndex!].items?.insert(itemIndex!, item!);
+
+        final docRef = FirebaseFirestore.instance
+            .collection('BoardItemObject')
+            .doc(item?.id);
+        docRef.update({'inBoard': _listData[listIndex].title});
       },
-      onTapItem: (listIndex, itemIndex, state) async {},
+      onTapItem: (listIndex, itemIndex, state) async {
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(itemObject.title),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text("Assigned To: ${itemObject.assignedTo}"),
+                    const SizedBox(height: 10),
+                    Text("Assigned by: ${itemObject.assignedBy}"),
+                    const SizedBox(height: 10),
+                    Text("Description: ${itemObject.description}"),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            });
+      },
       item: Container(
         margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
         child: Card(
@@ -177,7 +217,7 @@ class BoardPageView extends State<BoardPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  itemObject.title,
+                  "Title: ${itemObject.title}",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -185,7 +225,7 @@ class BoardPageView extends State<BoardPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  itemObject.description ?? '',
+                  "Assigned To: ${itemObject.assignedTo}",
                   style: const TextStyle(
                     fontSize: 14,
                   ),
@@ -288,7 +328,8 @@ class BoardPageView extends State<BoardPage> {
       );
 
   void submitList(context) {
-    var list = BoardListObject(title: controllerTitle.text, items: []);
+    var list = BoardListObject(
+        title: controllerTitle.text, indexNumber: _listData.length, items: []);
     submitListToDatabase(context, list);
   }
 

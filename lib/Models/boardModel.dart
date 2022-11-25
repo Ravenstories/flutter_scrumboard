@@ -1,13 +1,16 @@
 class BoardListObject {
   String? id;
   String title;
+  num indexNumber;
   List<BoardItemObject>? items;
 
-  BoardListObject({this.id, required this.title, this.items});
+  BoardListObject(
+      {this.id, required this.title, required this.indexNumber, this.items});
 
   Map<String, dynamic> listToJson() {
     return {
       'id': id,
+      'indexNumber': indexNumber,
       'title': title,
     };
   }
@@ -16,6 +19,7 @@ class BoardListObject {
       BoardListObject(
         id: json['id'],
         title: json['title'],
+        indexNumber: json['indexNumber'],
         items: json['items'],
       );
 }
