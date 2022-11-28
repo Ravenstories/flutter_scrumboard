@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
 import 'shared/shared.dart';
 import 'shared/firebase_options.dart';
 
@@ -52,8 +55,8 @@ void initializeInformation() {
     );
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
+      'MainChannel_ID',
+      'MainChannel_Name',
       importance: Importance.max,
       priority: Priority.high,
       styleInformation: bigTextStyleInformation,
@@ -202,25 +205,25 @@ class _MyHomePageState extends State<MyHomePage> {
         .then((token) => {_token = token, print("Token: $_token")});
 
     //save the token to Firebase live database
-    String? modelInfo = Platform.isAndroid
-        ? (await fetchModelInfo() as AndroidDeviceInfo).model
-        : (await fetchModelInfo() as IosDeviceInfo).name;
+    String? modelInfo = await fetchModelInfo();
 
-    /*
-    FirebaseDatabase.instance
-        .ref("usertokens")
-        .child(modelInfo!)
-        .set({"token": _token});
-    */
+    FirebaseFirestore.instance
+        .collection('UserTokens')
+        .doc(_token)
+        .set({'token': _token, 'modelInfo': modelInfo});
   }
 
-  Future<BaseDeviceInfo> fetchModelInfo() async {
-    if (Platform.isAndroid) {
-      return await deviceInfoPlugin.androidInfo;
+  //Get model or operating system name
+  Future<String?> fetchModelInfo() async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return (await deviceInfoPlugin.iosInfo).model;
     }
-    if (Platform.isIOS) {
-      return await deviceInfoPlugin.iosInfo;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return (await deviceInfoPlugin.androidInfo).model;
     }
-    throw Exception("Only Android or IOS is supported!");
+    if (defaultTargetPlatform == TargetPlatform.windows) {
+      return (await deviceInfoPlugin.webBrowserInfo).platform;
+    }
+    throw Exception('Unsupported platform');
   }
 }
