@@ -166,4 +166,61 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  Future<void> requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    switch (settings.authorizationStatus) {
+      case AuthorizationStatus.authorized:
+        // ignore: avoid_print
+        print("....... User granted permission....");
+        break;
+      case AuthorizationStatus.provisional:
+        // ignore: avoid_print
+        print("....... User granted provisional permission....");
+        break;
+      default:
+        // ignore: avoid_print
+        print("....... User denied permission....");
+        break;
+    }
+  }
+
+  Future<void> fetchToken() async {
+    await FirebaseMessaging.instance
+        .getToken()
+        // ignore: avoid_print
+        .then((token) => {_token = token, print("Token: $_token")});
+
+    //save the token to Firebase live database
+    String? modelInfo = Platform.isAndroid
+        ? (await fetchModelInfo() as AndroidDeviceInfo).model
+        : (await fetchModelInfo() as IosDeviceInfo).name;
+
+    /*
+    FirebaseDatabase.instance
+        .ref("usertokens")
+        .child(modelInfo!)
+        .set({"token": _token});
+    */
+  }
+
+  Future<BaseDeviceInfo> fetchModelInfo() async {
+    if (Platform.isAndroid) {
+      return await deviceInfoPlugin.androidInfo;
+    }
+    if (Platform.isIOS) {
+      return await deviceInfoPlugin.iosInfo;
+    }
+    throw Exception("Only Android or IOS is supported!");
+  }
 }
