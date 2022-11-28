@@ -9,11 +9,12 @@ import 'shared/firebase_options.dart';
 /// 2. Add a new Android app to the project / Download the google-services.json file and place it in the android/app folder --DONE
 /// 3. Create a Scrum/Agile board and connect it to firebase --DONE
 /// 4. CRUD - Create: Check, Read: Check, Update, Delete
-/// 5. Push Notifications
+/// 5. Push Notifications --Can Recieve Notifications, but can't send them
 /// 6. Make new board
 /// 7. Save some data to local storate // Maybe and error log
 /// 8. Comment code and clean up -- Look into stateless and statefull widgets (Optimization)
-/// 9. Explain Security issues in app
+/// 9. Add a homescreen
+/// 10. Explain Security issues in app
 
 //Push Notifications Initialization
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

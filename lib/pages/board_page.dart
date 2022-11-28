@@ -1,12 +1,11 @@
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_scrumboard/models/boardModel.dart';
-import 'package:boardview/board_item.dart';
 import 'package:boardview/board_list.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:boardview/board_item.dart';
 import 'package:boardview/boardview.dart';
 import 'package:boardview/boardview_controller.dart';
 
+import '../models/board_item_object.dart';
+import '../models/board_list_object.dart';
 import '../shared/shared.dart';
 
 class BoardPage extends StatefulWidget {
@@ -54,6 +53,7 @@ class BoardPageView extends State<BoardPage> {
             stream: listStream(),
             builder: (context, listSnapshot) {
               if (listSnapshot.hasError) {
+                // ignore: avoid_print
                 print(listSnapshot.error);
                 return const Text(
                     'Something went wrong with getting the lists');
@@ -65,6 +65,7 @@ class BoardPageView extends State<BoardPage> {
                     stream: itemStream(),
                     builder: (context, itemSnapshot) {
                       if (itemSnapshot.hasError) {
+                        // ignore: avoid_print
                         print(itemSnapshot.error);
                         return const Text(
                             'Something went wrong with getting the items');
@@ -111,17 +112,19 @@ class BoardPageView extends State<BoardPage> {
 
   combineStreams() {
     //combine _listData and _itemData
-    _listData.forEach((listElement) {
+    for (var listElement in _listData) {
       listElement.items = [];
       //add item to list
+      //ignore: avoid_print
       print(listElement.title);
-      _itemData.forEach((itemElement) {
+      for (var itemElement in _itemData) {
         if (listElement.title == itemElement.inBoard) {
+          //ignore: avoid_print
           print(itemElement.title);
           listElement.items?.add(itemElement);
         }
-      });
-    });
+      }
+    }
   }
 
   createBoardList(BoardListObject listObject) {

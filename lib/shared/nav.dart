@@ -1,5 +1,5 @@
-import '../pages/boardPage.dart';
-import '../pages/userPage.dart';
+import '../pages/board_page.dart';
+import '../pages/user_page.dart';
 import 'shared.dart';
 import '../main.dart';
 
@@ -28,7 +28,7 @@ Widget buildHeader(BuildContext context) => Container(
         onTap: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const UserPage())),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: <Widget>[
               const CircleAvatar(
