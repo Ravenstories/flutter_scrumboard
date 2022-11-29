@@ -15,8 +15,10 @@ class ErrorLog {
   }
 
   Future<File?> saveToErrorlog(String error) async {
+    DateTime time = DateTime.now();
+    String errorToLog = "$time: $error \n";
     // ignore: avoid_print
-    print("Error: $error");
+    print("Error: $errorToLog");
     // ignore: avoid_print
     print("Error saved to: ${await _localPath}");
     targetPlatform.getTargetPlatform().then((value) async {
@@ -25,10 +27,10 @@ class ErrorLog {
       switch (value) {
         case 'Android':
           final file = await _localFile;
-          return file.writeAsString(error);
+          return file.writeAsString(errorToLog, mode: FileMode.append);
         case 'iOS':
           final file = await _localFile;
-          return file.writeAsString(error);
+          return file.writeAsString(errorToLog, mode: FileMode.append);
         case 'Win32':
           // ignore: avoid_print
           print("Platform not supported");

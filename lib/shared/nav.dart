@@ -1,4 +1,5 @@
 import '../pages/board_page.dart';
+import '../pages/error_log_test_page.dart';
 import '../pages/user_page.dart';
 import 'shared.dart';
 import '../main.dart';
@@ -87,19 +88,15 @@ Widget buildMenuItem(BuildContext context) => Container(
         ),
         ListTile(
           leading: const Icon(Icons.settings),
-          title: const Text('Settings'),
-          onTap: () => {},
+          title: const Text('Error Log Test'),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const ErrorLogTestPage())),
         ),
         ListTile(
           leading: const Icon(Icons.account_circle),
           title: const Text('Profile'),
           onTap: () => Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => const UserPage())),
-        ),
-        ListTile(
-          leading: const Icon(Icons.info),
-          title: const Text('About'),
-          onTap: () => {},
         ),
       ]),
     );

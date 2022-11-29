@@ -6,6 +6,8 @@ class GetTargetPlatform {
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   Map<String, dynamic> _deviceData = <String, dynamic>{};
 
+  //*Get device model*//
+  /*
   Future<String?> getTargetPlatform() async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return (await deviceInfoPlugin.iosInfo).name;
@@ -22,32 +24,29 @@ class GetTargetPlatform {
     saveToErrorlog.saveToErrorlog("getTargetPlatform didn't return a value");
     return null;
   }
+  */
 
-  Future<void> initPlatformState() async {
-    var deviceData = <String, dynamic>{};
-
+  Future<String?> getTargetPlatform() async {
     try {
       if (kIsWeb) {
-        deviceData = _readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
+        return "Web";
       } else {
         if (Platform.isAndroid) {
-          deviceData =
-              _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+          return "Android";
         } else if (Platform.isIOS) {
-          deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+          return "iOS";
         } else if (Platform.isLinux) {
-          deviceData = _readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
+          return "Linux";
         } else if (Platform.isMacOS) {
-          deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
+          return "MacOS";
         } else if (Platform.isWindows) {
-          deviceData =
-              _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
+          return "Windows";
         }
       }
-    } on PlatformException {
-      deviceData = <String, dynamic>{
-        'Error:': 'Failed to get platform version.'
-      };
+    } catch (e) {
+      ErrorLog saveToErrorlog = ErrorLog();
+      saveToErrorlog.saveToErrorlog("getTargetPlatform didn't return a value");
+      return 'Error: Failed to get platform version.';
     }
   }
 

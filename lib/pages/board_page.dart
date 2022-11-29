@@ -101,18 +101,26 @@ class BoardPageView extends State<BoardPage> {
               children: <Widget>[
                 FloatingActionButton(
                   heroTag: "btn1",
-                  onPressed: () => createNewItem(context),
+                  onPressed: () => createNewItemDialog(context),
                   tooltip: 'Add Item to Board',
                   child: const Icon(Icons.add),
                 ),
                 FloatingActionButton(
                   heroTag: "btn2",
-                  onPressed: () => createNewList(context),
+                  onPressed: () => createNewListDialog(context),
                   tooltip: 'Create new list',
                   child: const Icon(Icons.list_alt_outlined),
                 ),
               ],
             )));
+  }
+
+  controllersSetToNull() {
+    controllerTitle.text = '';
+    controllerAssignedTo.text = '';
+    controllerInBoard.text = '';
+    controllerAssignedBy.text = '';
+    controllerDescription.text = '';
   }
 
   combineStreams() {
@@ -142,7 +150,9 @@ class BoardPageView extends State<BoardPage> {
     }
     return BoardList(
       onStartDragList: (index) {},
-      onTapList: (listIndex) async {},
+      onTapList: (listIndex) async {
+        updateListDialog(context, listObject);
+      },
       onDropList: (oldListIndex, listIndex) {
         final docRefOld = FirebaseFirestore.instance
             .collection('BoardListObject')
@@ -211,6 +221,15 @@ class BoardPageView extends State<BoardPage> {
                       Navigator.of(context).pop();
                     },
                   ),
+                  TextButton(
+                    onPressed: ((() => updateItemDialog(context, itemObject))),
+                    child: const Text('Update'),
+                  ),
+                  TextButton(
+                    onPressed: (() => deleteItem(context, itemObject)),
+                    child: const Text('Delete',
+                        style: TextStyle(color: Colors.red)),
+                  ),
                 ],
               );
             });
@@ -246,7 +265,25 @@ class BoardPageView extends State<BoardPage> {
     );
   }
 
-  createNewItem(BuildContext context) => showDialog(
+  void submitItem(context) {
+    var item = BoardItemObject(
+      title: controllerTitle.text,
+      inBoard: 'To-Do',
+      assignedTo: controllerAssignedTo.text,
+      assignedBy: controllerAssignedBy.text,
+      description: controllerDescription.text,
+    );
+    submitToDatabase(context, 'BoardItemObject', item);
+    controllersSetToNull();
+  }
+
+  void submitList(context) {
+    var list = BoardListObject(
+        title: controllerTitle.text, indexNumber: _listData.length, items: []);
+    submitToDatabase(context, 'BoardListObject', list);
+  }
+
+  createNewItemDialog(BuildContext context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Create Item'),
@@ -281,34 +318,14 @@ class BoardPageView extends State<BoardPage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () => submit(context),
+              onPressed: () => submitItem(context),
               child: const Text('Submit'),
             ),
           ],
         ),
       );
 
-  void submit(context) {
-    var item = BoardItemObject(
-      title: controllerTitle.text,
-      inBoard: 'To-Do',
-      assignedTo: controllerAssignedTo.text,
-      assignedBy: controllerAssignedBy.text,
-      description: controllerDescription.text,
-    );
-    submitItemToDatabase(context, item);
-  }
-
-  Future submitItemToDatabase(context, BoardItemObject item) async {
-    final docItem =
-        FirebaseFirestore.instance.collection('BoardItemObject').doc();
-    item.id = docItem.id;
-    final json = item.itemToJson();
-    await docItem.set(json);
-    Navigator.pop(context);
-  }
-
-  createNewList(BuildContext context) => showDialog(
+  createNewListDialog(BuildContext context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Create List'),
@@ -335,18 +352,162 @@ class BoardPageView extends State<BoardPage> {
         ),
       );
 
-  void submitList(context) {
-    var list = BoardListObject(
-        title: controllerTitle.text, indexNumber: _listData.length, items: []);
-    submitListToDatabase(context, list);
+  updateItemDialog(BuildContext context, BoardItemObject itemObject) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(itemObject.title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                    controller: controllerTitle,
+                    decoration: InputDecoration(
+                      hintText: itemObject.title,
+                    )),
+                TextField(
+                    controller: controllerAssignedTo,
+                    decoration: InputDecoration(
+                      hintText: itemObject.assignedTo,
+                    )),
+                TextField(
+                    controller: controllerAssignedBy,
+                    decoration: InputDecoration(
+                      hintText: itemObject.assignedBy,
+                    )),
+                TextField(
+                    controller: controllerDescription,
+                    decoration: InputDecoration(
+                      hintText: itemObject.description,
+                    )),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => updateItemToDatabase(context, itemObject)
+                    .then((value) => Navigator.pop(context)),
+                child: const Text('Submit'),
+              ),
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 
-  Future submitListToDatabase(context, BoardListObject list) async {
-    final docItem =
-        FirebaseFirestore.instance.collection('BoardListObject').doc();
-    list.id = docItem.id;
-    final json = list.listToJson();
-    await docItem.set(json);
+  updateListDialog(BuildContext context, BoardListObject listObject) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(listObject.title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                    controller: controllerTitle,
+                    decoration: InputDecoration(
+                      hintText: listObject.title,
+                    )),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => updateListToDatabase(context, listObject),
+                child: const Text('Submit'),
+              ),
+              TextButton(
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onPressed: () =>
+                    {deleteList(context, listObject), Navigator.pop(context)},
+              ),
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  Future submitToDatabase(context, String collection, var item) async {
+    final docItem = FirebaseFirestore.instance.collection(collection).doc();
+    item.id = docItem.id;
+    Map<String, dynamic> json;
+
+    if (collection == 'BoardItemObject') {
+      json = item.itemToJson();
+      await docItem.set(json);
+    } else if (collection == 'BoardListObject') {
+      json = item.listToJson();
+      await docItem.set(json);
+    }
     Navigator.pop(context);
+  }
+
+  Future deleteItem(context, BoardItemObject item) async {
+    final docRef =
+        FirebaseFirestore.instance.collection('BoardItemObject').doc(item.id);
+    await docRef.delete();
+
+    Navigator.pop(context);
+  }
+
+  Future updateItemToDatabase(context, BoardItemObject itemObject) async {
+    var item = BoardItemObject(
+      id: itemObject.id,
+      title: controllerTitle.text.isEmpty
+          ? itemObject.title
+          : controllerTitle.text,
+      inBoard: itemObject.inBoard ?? 'To-Do',
+      assignedTo: controllerAssignedTo.text.isEmpty
+          ? itemObject.assignedTo
+          : controllerAssignedTo.text,
+      assignedBy: controllerAssignedBy.text.isEmpty
+          ? itemObject.assignedBy
+          : controllerAssignedBy.text,
+      description: controllerDescription.text.isEmpty
+          ? itemObject.description
+          : controllerDescription.text,
+    );
+
+    final docRef =
+        FirebaseFirestore.instance.collection('BoardItemObject').doc(item.id);
+    await docRef.update(item.itemToJson());
+    controllersSetToNull();
+    Navigator.pop(context);
+  }
+
+  Future updateListToDatabase(context, BoardListObject listObject) async {
+    var list = BoardListObject(
+      id: listObject.id,
+      title: controllerTitle.text.isEmpty
+          ? listObject.title
+          : controllerTitle.text,
+      indexNumber: listObject.indexNumber,
+    );
+
+    final docRef =
+        FirebaseFirestore.instance.collection('BoardListObject').doc(list.id);
+    await docRef.update(list.listToJson());
+    controllersSetToNull();
+    Navigator.pop(context);
+  }
+
+  Future deleteList(BuildContext context, BoardListObject listObject) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('BoardListObject')
+        .doc(listObject.id);
+    await docRef.delete();
   }
 }

@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'shared/shared.dart';
 import 'shared/firebase_options.dart';
 
-/// To-Do:
+/// To-Do List have been moved to kanban board:
+///
 /// 1. Create a new Firebase project --DONE
 /// 2. Add a new Android app to the project / Download the google-services.json file and place it in the android/app folder --DONE
 /// 3. Create a Scrum/Agile board and connect it to firebase --DONE
@@ -14,7 +15,6 @@ import 'shared/firebase_options.dart';
 /// 8. Comment code and clean up -- Look into stateless and statefull widgets (Optimization)
 /// 9. Add a homescreen
 /// 10. Explain Security issues in app
-/// 11. Add push api
 
 //Push Notifications Initialization
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -107,7 +107,10 @@ class Home extends StatelessWidget {
     return MaterialApp(
       title: 'Board Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Colors.indigo.shade800,
+          secondary: Colors.purple.shade500,
+        ),
       ),
       home: const MyHomePage(title: 'Board Demo Home Page'),
     );
@@ -126,20 +129,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String? _token;
   ErrorLog errorLog = ErrorLog();
-  int _counter = 0;
 
   @override
   void initState() {
     super.initState();
     requestPermission();
     fetchToken();
-  }
-
-  void _incrementCounter() {
-    errorLog.saveToErrorlog("This is a test of the error log");
-    setState(() {
-      _counter++;
-    });
   }
 
   @override
@@ -152,32 +147,15 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            FutureBuilder<String>(
-              future: errorLog.readErrorLog(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(snapshot.data!);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                return const CircularProgressIndicator();
-              },
+          children: const <Widget>[
+            Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text(
+                'Welcome to the Kanban Board Demo. To get started, press the board button in the menu. \nAlternately you can also check the write to error log page.',
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
@@ -197,15 +175,15 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (settings.authorizationStatus) {
       case AuthorizationStatus.authorized:
         // ignore: avoid_print
-        print("....... User granted permission....");
+        print("AuthorizationStatus: authorized");
         break;
       case AuthorizationStatus.provisional:
         // ignore: avoid_print
-        print("....... User granted provisional permission....");
+        print("AuthorizationStatus: provisional");
         break;
       default:
         // ignore: avoid_print
-        print("....... User denied permission....");
+        print("AuthorizationStatus: denied");
         break;
     }
   }
