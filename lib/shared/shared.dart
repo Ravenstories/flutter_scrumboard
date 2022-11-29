@@ -4,4 +4,7 @@ export 'package:flutter_local_notifications/flutter_local_notifications.dart';
 export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_messaging/firebase_messaging.dart';
 export 'package:device_info_plus/device_info_plus.dart';
+export 'package:flutter/foundation.dart';
 export 'nav.dart';
+export 'get_target_platform.dart';
+export 'error_log.dart';

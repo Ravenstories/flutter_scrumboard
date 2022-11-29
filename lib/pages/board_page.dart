@@ -16,6 +16,8 @@ class BoardPage extends StatefulWidget {
 }
 
 class BoardPageView extends State<BoardPage> {
+  ErrorLog saveToErrorlog = ErrorLog();
+
   Stream<List<BoardListObject>> listStream() => FirebaseFirestore.instance
       .collection('BoardListObject')
       .snapshots()
@@ -55,8 +57,9 @@ class BoardPageView extends State<BoardPage> {
               if (listSnapshot.hasError) {
                 // ignore: avoid_print
                 print(listSnapshot.error);
+                saveToErrorlog.saveToErrorlog(listSnapshot.error.toString());
                 return const Text(
-                    'Something went wrong with getting the lists');
+                    'Something went wrong with getting the lists, see errorlog for more info');
               } else if (listSnapshot.hasData) {
                 _listData = listSnapshot.data!;
                 _listData
@@ -67,8 +70,10 @@ class BoardPageView extends State<BoardPage> {
                       if (itemSnapshot.hasError) {
                         // ignore: avoid_print
                         print(itemSnapshot.error);
+                        saveToErrorlog
+                            .saveToErrorlog(listSnapshot.error.toString());
                         return const Text(
-                            'Something went wrong with getting the items');
+                            'Something went wrong with getting the items, see errorlog for more info');
                       } else if (itemSnapshot.hasData) {
                         _itemData = itemSnapshot.data!;
                         combineStreams();

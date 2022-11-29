@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 
 import 'shared/shared.dart';
 import 'shared/firebase_options.dart';
@@ -9,12 +8,13 @@ import 'shared/firebase_options.dart';
 /// 2. Add a new Android app to the project / Download the google-services.json file and place it in the android/app folder --DONE
 /// 3. Create a Scrum/Agile board and connect it to firebase --DONE
 /// 4. CRUD - Create: Check, Read: Check, Update, Delete
-/// 5. Push Notifications --Can Recieve Notifications, but can't send them
+/// 5. Push Notifications --DONE
 /// 6. Make new board
-/// 7. Save some data to local storate // Maybe and error log
+/// 7. Save some data to local storate // Maybe and error log --DONE
 /// 8. Comment code and clean up -- Look into stateless and statefull widgets (Optimization)
 /// 9. Add a homescreen
 /// 10. Explain Security issues in app
+/// 11. Add push api
 
 //Push Notifications Initialization
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -125,8 +125,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String? _token;
-  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-
+  ErrorLog errorLog = ErrorLog();
   int _counter = 0;
 
   @override
@@ -137,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _incrementCounter() {
+    errorLog.saveToErrorlog("This is a test of the error log");
     setState(() {
       _counter++;
     });
@@ -159,6 +159,17 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
+            ),
+            FutureBuilder<String>(
+              future: errorLog.readErrorLog(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(snapshot.data!);
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+                return const CircularProgressIndicator();
+              },
             ),
           ],
         ),
@@ -205,26 +216,14 @@ class _MyHomePageState extends State<MyHomePage> {
         // ignore: avoid_print
         .then((token) => {_token = token, print("Token: $_token")});
 
-    //save the token to Firebase live database
-    String? modelInfo = await fetchModelInfo();
+    // Get the platform information
+    GetTargetPlatform targetPlatform = GetTargetPlatform();
+    String? modelInfo = await targetPlatform.getTargetPlatform();
 
+    //save the token to Firebase live database
     FirebaseFirestore.instance
         .collection('UserTokens')
         .doc(_token)
         .set({'token': _token, 'modelInfo': modelInfo});
-  }
-
-  //Get model or operating system name
-  Future<String?> fetchModelInfo() async {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return (await deviceInfoPlugin.iosInfo).model;
-    }
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return (await deviceInfoPlugin.androidInfo).model;
-    }
-    if (defaultTargetPlatform == TargetPlatform.windows) {
-      return (await deviceInfoPlugin.webBrowserInfo).platform;
-    }
-    throw Exception('Unsupported platform');
   }
 }
