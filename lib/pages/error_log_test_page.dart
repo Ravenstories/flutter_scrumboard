@@ -7,6 +7,10 @@ class ErrorLogTestPage extends StatefulWidget {
   State<ErrorLogTestPage> createState() => _ErrorLogTestPage();
 }
 
+///This class is for testing the error log
+///It uses the error_log.dart file
+///To show that data can saved locally
+
 class _ErrorLogTestPage extends State<ErrorLogTestPage> {
   ErrorLog errorLog = ErrorLog();
 
@@ -28,6 +32,9 @@ class _ErrorLogTestPage extends State<ErrorLogTestPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            const Text(
+                "Note! This page is for testing purposes only and only works on mobile devices."),
+            const Padding(padding: EdgeInsets.only(bottom: 60)),
             const Text(
               'Push the button to create a new error log. \nThis is the error logs that are stored:',
             ),

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_scrumboard/shared/shared.dart';
 
+///This class if for signing in the user
+///It uses the firebase_auth package
 class LoginWidget extends StatelessWidget {
   LoginWidget({super.key});
   //User login page
@@ -51,7 +53,7 @@ class LoginWidget extends StatelessWidget {
               ),
               icon: const Icon(Icons.login),
               label: const Text('Login'),
-              onPressed: login,
+              onPressed: (() => {login(), Navigator.pop(context)}),
             ),
           ],
         ),
