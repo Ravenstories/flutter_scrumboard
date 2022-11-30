@@ -1,6 +1,11 @@
+import 'dart:html';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_scrumboard/pages/user_page.dart';
+
 import '../pages/board_page.dart';
 import '../pages/error_log_test_page.dart';
-import '../pages/user_page.dart';
+import '../pages/login_widget.dart';
 import 'shared.dart';
 import '../main.dart';
 
@@ -26,8 +31,7 @@ Widget buildHeader(BuildContext context) => Container(
       padding: EdgeInsets.only(
           top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
       child: InkWell(
-        onTap: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const UserPage())),
+        onTap: () => loginDialog(context),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -95,8 +99,27 @@ Widget buildMenuItem(BuildContext context) => Container(
         ListTile(
           leading: const Icon(Icons.account_circle),
           title: const Text('Profile'),
-          onTap: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const UserPage())),
+          onTap: () => loginDialog(context),
         ),
       ]),
     );
+
+loginDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      content: Scaffold(
+          body: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: ((context, snapshot) {
+                if (snapshot.hasData) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const UserPage()));
+                  return Home();
+                } else {
+                  return LoginWidget();
+                }
+              }))),
+    ),
+  );
+}
