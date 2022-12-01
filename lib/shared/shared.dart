@@ -8,7 +8,7 @@ export 'package:flutter/foundation.dart';
 export 'nav.dart';
 export 'get_target_platform.dart';
 export 'error_log.dart';
-
+export 'utilities.dart';
 
 ///This for keeping my code clean
-///The most comoonly used imports are here
+///The most commonly used imports are here

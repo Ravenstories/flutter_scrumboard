@@ -6,6 +6,7 @@ import '../pages/login_widget.dart';
 import 'shared.dart';
 import '../main.dart';
 
+///This class is used for navigating between pages
 class NavigationDrawer extends StatelessWidget {
   const NavigationDrawer({super.key});
 

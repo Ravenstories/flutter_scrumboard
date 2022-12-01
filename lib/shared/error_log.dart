@@ -1,6 +1,9 @@
 import 'package:flutter_scrumboard/shared/shared.dart';
 import 'package:path_provider/path_provider.dart';
 
+///This class is for saving errors to a file
+///This is for debugging purposes
+///It only works on mobile devices
 class ErrorLog {
   GetTargetPlatform targetPlatform = GetTargetPlatform();
 
@@ -42,6 +45,8 @@ class ErrorLog {
     return null;
   }
 
+  ///Read the error log and return it as a string
+  ///It will be displayed in the error log test page
   Future<String> readErrorLog() async {
     try {
       final file = await _localFile;

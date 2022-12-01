@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter_scrumboard/pages/signup_widget.dart';
 import 'package:flutter_scrumboard/shared/shared.dart';
 
 ///This class if for signing in the user
 ///It uses the firebase_auth package
 class LoginWidget extends StatelessWidget {
-  LoginWidget({super.key});
-  //User login page
+  LoginWidget({Key? key}) : super(key: key);
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -55,14 +56,52 @@ class LoginWidget extends StatelessWidget {
               label: const Text('Login'),
               onPressed: (() => {login(), Navigator.pop(context)}),
             ),
+            const SizedBox(height: 30),
+            RichText(
+              text: TextSpan(
+                text: 'Don\'t have an account? ',
+                style: const TextStyle(color: Colors.black),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: 'Sign up',
+                    style: const TextStyle(color: Colors.blue),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = (() => signUpDialog(context)),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       );
 
+  ///This function is for signing in the user
+  ///It uses: the firebase_auth package, the email and password from the text fields.
+  ///It shows a toast if there was and unsuccessful login
   Future login() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        // ignore: avoid_print
+        print('User couldn\'t be logged in.');
+        Utilities.showToast('We couldn\'t log you in. Please try again.');
+      } else {
+        // ignore: avoid_print
+        print('Error: $e');
+      }
+    }
   }
+
+  ///Displays a dialog for signing up
+  ///It uses: the signup_widget.dart
+  signUpDialog(BuildContext context) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            content: Scaffold(
+              body: SignUpWidget(),
+            ),
+          ));
 }

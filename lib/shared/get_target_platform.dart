@@ -1,8 +1,8 @@
 import 'package:flutter_scrumboard/shared/shared.dart';
 
-///Get model or operating system name
-///Returns the name of the operating system
-///Made like this so other parts of the system can find the operating system
+///Used for determining which platform the app is running on
+///Returns the name of the operating system as a string
+///Used by the error log class and the fetch token function in main.dart
 class GetTargetPlatform {
   Future<String?> getTargetPlatform() async {
     try {

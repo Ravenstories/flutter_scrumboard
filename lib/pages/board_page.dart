@@ -8,6 +8,10 @@ import '../models/board_item_object.dart';
 import '../models/board_list_object.dart';
 import '../shared/shared.dart';
 
+///Board page
+///This is a big one. If I had more time I would have split this up into smaller widgets.
+///This is the page where you can administer your board.
+///It is also where you can add and remove lists and items.
 class BoardPage extends StatefulWidget {
   const BoardPage({super.key});
 
@@ -115,6 +119,7 @@ class BoardPageView extends State<BoardPage> {
             )));
   }
 
+  ///Set the controllers so the text won't pass over the next time you open a dialog.
   controllersSetToNull() {
     controllerTitle.text = '';
     controllerAssignedTo.text = '';
@@ -123,6 +128,7 @@ class BoardPageView extends State<BoardPage> {
     controllerDescription.text = '';
   }
 
+  ///Combines the streams from the lists and the items so they display correctly.
   combineStreams() {
     //combine _listData and _itemData
     for (var listElement in _listData) {
@@ -140,6 +146,8 @@ class BoardPageView extends State<BoardPage> {
     }
   }
 
+  ///Functions for getting, creating etc and displaying on the board page.
+  ///Given more time they would have been split up into their own classes.
   createBoardList(BoardListObject listObject) {
     List<BoardItem>? items = [];
 

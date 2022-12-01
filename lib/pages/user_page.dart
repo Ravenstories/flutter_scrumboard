@@ -1,5 +1,8 @@
 import 'package:flutter_scrumboard/shared/shared.dart';
 
+///Placeholder page.
+///I didn't get aroudn to implementing this page.
+///It was supposed to be a page where you could edit your profile.
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
 
